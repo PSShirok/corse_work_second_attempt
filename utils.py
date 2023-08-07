@@ -20,7 +20,7 @@ def sort_operation_by_data(operations):
     for operation in operations:
         if "date" in operation:
             date_operations.append(operation)
-    sort_by_date = sorted(date_operations, key=lambda x: operation["date"])
+    sort_by_date = sorted(date_operations, key=lambda x: x["date"], reverse=True)
     return sort_by_date
 
 
@@ -51,17 +51,22 @@ def print_check(last_operations):
 {operation["from"] if 'from' in operation else ""} -> {operation["to"]}
 {operation["operationAmount"]["amount"]} {operation["operationAmount"]["currency"]["name"]}\n""")
 
-# def print_operations():
-#     """
-#     :return: вывод статистики в нужном формате
-#     """
-#     date_operations = get_date_sort()
-#     date_operations.reverse()
-#     for payment_date in date_operations:
-#         for operation in card_operations:
-#             if "date" in operation:
-#                 if operation['date'] == payment_date:
-#                     date_operation = datetime.datetime.strptime(payment_date, '%Y-%m-%dT%H:%M:%S.%f')
-#                     print(f"""{date_operation.strftime("%d.%m.%Y")} {operation["description"]}
-# {format_from(operation["from"]) if 'from' in operation else ""} -> {format_from(operation["to"])}
-# {operation["operationAmount"]["amount"]} {operation["operationAmount"]["currency"]["name"]}\n""")
+
+def masked_number(last_operations):
+    for operation in last_operations:
+        if "from" in operation:
+            mask_number = operation["from"].split()[-1]
+            mask_is_alpha = ["" if num.isdigit() else num for num in operation["from"]]
+            if len(mask_number) == 20:
+                operation["from"] = "".join(mask_is_alpha)+f"** {mask_number[-4:]}"
+            else:
+                operation["from"] = "".join(mask_is_alpha) + f"{mask_number[:4]} {mask_number[5:7]}** **** {mask_number[-4:]}"
+
+        mask_number = operation["to"].split()[-1]
+        mask_is_alpha = ["" if num.isdigit() else num for num in operation["to"]]
+        if len(mask_number) == 20:
+            operation["to"] = "".join(mask_is_alpha) + f"** {mask_number[-4:]}"
+        else:
+            operation["to"] = "".join(mask_is_alpha) + f"{mask_number[:4]} {mask_number[5:7]}** **** {mask_number[-4:]}"
+
+    return last_operations
