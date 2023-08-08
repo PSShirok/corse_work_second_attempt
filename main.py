@@ -6,7 +6,12 @@ sort_operations = sort_operation_by_data(card_operations)
 
 last_operations = get_operation_last_x(sort_operations, 5)
 
-masked_account = masked_number(last_operations)
+for operation in last_operations:
+    if "from" in operation:
+        operation["from"] = masked_number(operation["from"])
+    operation["to"] = masked_number(operation["to"])
 
-print_check(masked_account)
+show_check = print_check(last_operations)
 
+for operation in show_check:
+    print(operation)

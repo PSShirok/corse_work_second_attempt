@@ -45,28 +45,19 @@ def print_check(last_operations):
     :param last_operations: список словарей операций
     :return: возврат статистики в определнном формате
     """
+    last_operations_list = []
     for operation in last_operations:
         date_operation = datetime.datetime.strptime(operation["date"], '%Y-%m-%dT%H:%M:%S.%f')
-        print(f"""{date_operation.strftime("%d.%m.%Y")} {operation["description"]}
+        last_operations_list.append(f"""{date_operation.strftime("%d.%m.%Y")} {operation["description"]}
 {operation["from"] if 'from' in operation else ""} -> {operation["to"]}
 {operation["operationAmount"]["amount"]} {operation["operationAmount"]["currency"]["name"]}\n""")
+    return last_operations_list
 
 
-def masked_number(last_operations):
-    for operation in last_operations:
-        if "from" in operation:
-            mask_number = operation["from"].split()[-1]
-            mask_is_alpha = ["" if num.isdigit() else num for num in operation["from"]]
-            if len(mask_number) == 20:
-                operation["from"] = "".join(mask_is_alpha)+f"** {mask_number[-4:]}"
-            else:
-                operation["from"] = "".join(mask_is_alpha) + f"{mask_number[:4]} {mask_number[5:7]}** **** {mask_number[-4:]}"
-
-        mask_number = operation["to"].split()[-1]
-        mask_is_alpha = ["" if num.isdigit() else num for num in operation["to"]]
-        if len(mask_number) == 20:
-            operation["to"] = "".join(mask_is_alpha) + f"** {mask_number[-4:]}"
-        else:
-            operation["to"] = "".join(mask_is_alpha) + f"{mask_number[:4]} {mask_number[5:7]}** **** {mask_number[-4:]}"
-
-    return last_operations
+def masked_number(account):
+    mask_number = account.split()[-1]
+    mask_is_alpha = ["" if num.isdigit() else num for num in account]
+    if len(mask_number) == 20:
+        return "".join(mask_is_alpha)+f"** {mask_number[-4:]}"
+    else:
+        return "".join(mask_is_alpha) + f"{mask_number[:4]} {mask_number[5:7]}** **** {mask_number[-4:]}"
